@@ -31,4 +31,24 @@ class Report extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    public function votes()
+    {
+        return $this->hasMany(ReportVote::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(ReportComment::class);
+    }
+
+    public function rootComments()
+    {
+        return $this->hasMany(ReportComment::class)->whereNull('parent_comment_id');
+    }
+
+    public function votesCount()
+    {
+        return $this->votes()->count();
+    }
 }

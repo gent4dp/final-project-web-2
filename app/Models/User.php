@@ -49,4 +49,14 @@ class User extends Authenticatable
     {
         return $this->hasMany(Report::class);
     }
+
+    public function votes()
+    {
+        return $this->hasMany(ReportVote::class);
+    }
+
+    public function comments()
+    {
+        return $this->hasMany(ReportComment::class);
+    }
 }

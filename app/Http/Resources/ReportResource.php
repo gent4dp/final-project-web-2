@@ -9,6 +9,13 @@ class ReportResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $userHasVoted = false;
+        if ($request->user()) {
+            $userHasVoted = $this->votes()
+                                  ->where('user_id', $request->user()->id)
+                                  ->exists();
+        }
+
         return [
             'id' => $this->id,
             'judul_laporan' => $this->judul_laporan,
@@ -22,6 +29,9 @@ class ReportResource extends JsonResource
                 'name' => $this->user->name,
                 'email' => $this->user->email,
             ],
+            'votes_count' => $this->votes()->count(),
+            'user_vote' => $userHasVoted,
+            'comments_count' => $this->comments()->count(),
             'created_at' => $this->created_at?->toIso8601String(),
             'updated_at' => $this->updated_at?->toIso8601String(),
         ];

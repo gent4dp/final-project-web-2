@@ -2,6 +2,8 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\ReportVoteController;
+use App\Http\Controllers\ReportCommentController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -30,9 +32,21 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/', [ReportController::class, 'index']);
         Route::post('/', [ReportController::class, 'store']);
 
+        Route::prefix('{reportId}')->group(function () {
+            Route::post('/votes', [ReportVoteController::class, 'toggleVote']);
+            Route::get('/comments', [ReportCommentController::class, 'index']);
+            Route::post('/comments', [ReportCommentController::class, 'store']);
+        });
+
         Route::middleware('checkRole:admin')->group(function () {
             Route::put('/{id}/status', [ReportController::class, 'updateStatus']);
         });
     });
+
+    Route::prefix('comments')->group(function () {
+        Route::put('/{commentId}', [ReportCommentController::class, 'update']);
+        Route::delete('/{commentId}', [ReportCommentController::class, 'destroy']);
+    });
 });
+
 
