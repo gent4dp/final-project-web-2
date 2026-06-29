@@ -2,7 +2,8 @@
 
 ## Authentication
 ```
-POST   /auth/login              # Login (NIM + Password)
+POST   /auth/register           # Register (Email + Password)
+POST   /auth/login              # Login (Email + Password)
 GET    /auth/profile            # Get Current User
 POST   /auth/logout             # Logout
 ```
@@ -138,11 +139,17 @@ Fields:
 
 ## Examples
 
-### 1. Login
+### 1. Register & Login
 ```bash
+# Register
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{"email":"john@example.com","password":"password123"}'
+
+# Login
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"nim":"2024001","password":"password123"}'
+  -d '{"email":"john@example.com","password":"password123"}'
 ```
 
 ### 2. Get Reports with Search
@@ -244,8 +251,12 @@ curl -X PUT http://localhost:8000/api/reports/5/status \
 ### Update Report Status
 - `status`: required, must be one of: pending, diproses, selesai
 
+### Register
+- `email`: required, string, email
+- `password`: required, string, min 6 characters
+
 ### Login
-- `nim`: required, string
+- `email`: required, string, email
 - `password`: required, string
 
 ---
@@ -254,6 +265,7 @@ curl -X PUT http://localhost:8000/api/reports/5/status \
 
 | Action | User | Admin |
 |--------|------|-------|
+| Register | ✅ | ✅ |
 | Login | ✅ | ✅ |
 | View Reports | ✅ | ✅ |
 | Create Report | ✅ | ✅ |

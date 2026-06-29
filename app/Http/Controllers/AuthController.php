@@ -12,15 +12,15 @@ class AuthController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'nim' => 'required|string',
+            'email' => 'required|string|email',
             'password' => 'required|string',
         ]);
 
-        $user = User::where('nim', $request->nim)->first();
+        $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || $request->password !== $user->password) {
             throw ValidationException::withMessages([
-                'nim' => ['The provided credentials are incorrect.'],
+                'email' => ['The provided credentials are incorrect.'],
             ]);
         }
 
@@ -29,6 +29,50 @@ class AuthController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Login successful',
+            'data' => [
+                'user' => [
+                    'id' => $user->id,
+                    'nim' => $user->nim,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'role' => $user->role,
+                ],
+                'token' => $token,
+            ],
+        ]);
+    }
+
+    public function register(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|string|email',
+            'password' => 'required|string|min:6',
+        ]);
+
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email campus tidak terdaftar di sistem.',
+            ], 422);
+        }
+
+        if ($user->password !== null && $user->password !== '') {
+            return response()->json([
+                'success' => false,
+                'message' => 'Email campus sudah terdaftar.',
+            ], 422);
+        }
+
+        $user->password = $request->password;
+        $user->save();
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Registration successful',
             'data' => [
                 'user' => [
                     'id' => $user->id,

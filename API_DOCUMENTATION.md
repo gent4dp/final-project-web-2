@@ -47,10 +47,10 @@ Token diperoleh dari endpoint login dan berlaku unlimited.
 
 ## 1. Authentication Endpoints
 
-### 1.1 Login
-**Endpoint:** `POST /auth/login`
+### 1.1 Register
+**Endpoint:** `POST /auth/register`
 
-**Description:** Login dengan NIM dan password untuk mendapatkan access token.
+**Description:** Register/aktivasi user menggunakan email campus yang sudah terdaftar sebelumnya di database. Password akan disimpan sebagai plain text.
 
 **Headers:**
 ```
@@ -60,7 +60,75 @@ Content-Type: application/json
 **Request Body:**
 ```json
 {
-  "nim": "2024001",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response (200):**
+```json
+{
+  "success": true,
+  "message": "Registration successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "nim": "2024001",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "role": "user"
+    },
+    "token": "1|abc123def456xyz789..."
+  }
+}
+```
+
+**Response (422) - Validation Error:**
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "email": ["The email field is required."],
+    "password": ["The password field is required."]
+  }
+}
+```
+
+**Response (422) - Email Not Found or Already Registered:**
+```json
+{
+  "success": false,
+  "message": "Email campus tidak terdaftar di sistem."
+}
+```
+
+**cURL Example:**
+```bash
+curl -X POST http://localhost:8000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "password123"
+  }'
+```
+
+---
+
+### 1.2 Login
+**Endpoint:** `POST /auth/login`
+
+**Description:** Login dengan email campus dan password untuk mendapatkan access token.
+
+**Headers:**
+```
+Content-Type: application/json
+```
+
+**Request Body:**
+```json
+{
+  "email": "john@example.com",
   "password": "password123"
 }
 ```
@@ -89,7 +157,7 @@ Content-Type: application/json
   "success": false,
   "message": "Validation failed",
   "errors": {
-    "nim": ["The nim field is required."],
+    "email": ["The email field is required."],
     "password": ["The password field is required."]
   }
 }
@@ -101,7 +169,7 @@ Content-Type: application/json
   "success": false,
   "message": "Validation failed",
   "errors": {
-    "nim": ["The provided credentials are incorrect."]
+    "email": ["The provided credentials are incorrect."]
   }
 }
 ```
@@ -111,14 +179,14 @@ Content-Type: application/json
 curl -X POST http://localhost:8000/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
-    "nim": "2024001",
+    "email": "john@example.com",
     "password": "password123"
   }'
 ```
 
 ---
 
-### 1.2 Get Profile
+### 1.3 Get Profile
 **Endpoint:** `GET /auth/profile`
 
 **Description:** Mendapatkan data profil user yang sedang login.
@@ -162,7 +230,7 @@ curl -X GET http://localhost:8000/api/auth/profile \
 
 ---
 
-### 1.3 Logout
+### 1.4 Logout
 **Endpoint:** `POST /auth/logout`
 
 **Description:** Logout dan revoke access token.
@@ -923,6 +991,7 @@ curl -X DELETE "http://localhost:8000/api/comments/5" \
 
 | Method | Endpoint | Description | Auth | Role |
 |--------|----------|-------------|------|------|
+| POST | `/auth/register` | Register | ❌ | - |
 | POST | `/auth/login` | Login | ❌ | - |
 | GET | `/auth/profile` | Get profile | ✅ | Any |
 | POST | `/auth/logout` | Logout | ✅ | Any |
@@ -1007,7 +1076,7 @@ Pastikan token valid sebelum melakukan operasi protected. Token akan expired jik
 ```bash
 POST /auth/login
 {
-  "nim": "2024001",
+  "email": "john@example.com",
   "password": "password123"
 }
 
