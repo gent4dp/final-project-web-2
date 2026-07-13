@@ -13,10 +13,14 @@ class Report extends Model
     protected $fillable = [
         'user_id',
         'judul_laporan',
+        'kategori',
+        'prioritas',
+        'fakultas',
         'lokasi_fasilitas',
         'deskripsi_kerusakan',
         'foto_bukti',
         'status',
+        'catatan_admin',
     ];
 
     protected $hidden = [
